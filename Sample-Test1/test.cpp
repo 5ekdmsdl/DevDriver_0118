@@ -51,3 +51,26 @@ TEST(Read_Drive_Test,Read_Drive_SUCCESS_1Address)
 	DeviceDriver devdriv( &fdev_mock );
 	EXPECT_EQ(devdriv.read(0x00), 0x01);
 }
+
+TEST(Read_Write_Test,Read_Drive_FAIL_OccupiedAddress)
+{
+	MockFlashDev fdev_mock;
+	EXPECT_CALL(fdev_mock, read(_))
+		.WillOnce(Return(0x01));
+
+	DeviceDriver devdriv( &fdev_mock );
+	EXPECT_THROW(devdriv.write(0x00, 0x0A), std::exception);
+}
+
+TEST(Read_Write_Test,Read_Drive_SUCCESS)
+{
+	MockFlashDev fdev_mock;
+	EXPECT_CALL(fdev_mock, read(_))
+		.WillOnce(Return(0xFF))
+		.WillRepeatedly(Return(0x0A));
+
+	DeviceDriver devdriv( &fdev_mock );
+	devdriv.write(0x00, 0x0A);
+	EXPECT_THAT(devdriv.read(0x00), Eq(0x0A));
+}
+
