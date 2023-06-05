@@ -13,8 +13,7 @@ int DeviceDriver::read(long address)
 
 void DeviceDriver::write(long address, int data)
 {
-    // TODO: implement this method
-    m_hardware->write(address, (unsigned char)data);
+	writeOnDevice(address, data);
 }
 
 int DeviceDriver::readFromDevice(long address)
@@ -29,4 +28,14 @@ int DeviceDriver::readFromDevice(long address)
 
 		throw std::exception("");
 	}
+
+	return initialRes;
+}
+
+void DeviceDriver::writeOnDevice(long address, int data)
+{
+	int readRes = m_hardware->read(address);
+	if (readRes != 0xFF) throw std::exception("WriteFailException");
+
+	m_hardware->write(address, (unsigned char)data);
 }
